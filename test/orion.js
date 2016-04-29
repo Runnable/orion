@@ -125,13 +125,11 @@ describe('orion', () => {
       company_id: 'Company ID',
       name: 'Company NAME!'
     }
-    const resolved = Promise.resolve()
-    console.log('REALLY?', resolved.asCallback)
     beforeEach((done) => {
       sinon.stub(orion, 'canUseIntercom').returns(true)
       orion.intercomClient = {
         companies: {
-          create: sinon.stub().returns(resolved)
+          create: sinon.stub().returns(Promise.resolve())
         }
       }
       done()
