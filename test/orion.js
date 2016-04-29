@@ -142,7 +142,7 @@ describe('orion', () => {
       }
       done()
     })
-    
+
     afterEach((done) => {
       orion.canUseIntercom.restore()
       done()
