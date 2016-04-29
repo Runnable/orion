@@ -21,6 +21,7 @@ describe('orion', () => {
     sinon.stub(Intercom, 'Client').returns(mockIntercom)
     done()
   })
+
   afterEach((done) => {
     Intercom.Client.restore()
     done()
@@ -34,10 +35,12 @@ describe('orion', () => {
       sinon.stub(Orion.prototype, 'canUseIntercom').returns(true)
       done()
     })
+
     afterEach((done) => {
       Orion.prototype.canUseIntercom.restore()
       done()
     })
+
     it('should check if we can use intercom before creating an intercom client', (done) => {
       const orion = new Orion()
       sinon.assert.calledOnce(Orion.prototype.canUseIntercom)
@@ -55,6 +58,7 @@ describe('orion', () => {
     let existsStub
     let envIsStub
     let orion
+
     beforeEach((done) => {
       process.env.INTERCOM_API_KEY = 'fake api key'
       process.env.INTERCOM_APP_ID = 'fake app id'
@@ -85,6 +89,7 @@ describe('orion', () => {
       sinon.assert.calledWith(existsStub, process.env.INTERCOM_API_KEY)
       done()
     })
+
     it('should return false if no INTERCOM_APP_ID', (done) => {
       delete process.env.INTERCOM_APP_ID
       existsStub.withArgs(process.env.INTERCOM_API_KEY).returns(true)
@@ -94,6 +99,7 @@ describe('orion', () => {
       sinon.assert.calledWith(existsStub, process.env.INTERCOM_APP_ID)
       done()
     })
+
     it('should return false if not the right env', (done) => {
       existsStub.withArgs(process.env.INTERCOM_API_KEY).returns(true)
       existsStub.withArgs(process.env.INTERCOM_APP_ID).returns(true)
@@ -105,6 +111,7 @@ describe('orion', () => {
       sinon.assert.calledWith(existsStub, process.env.INTERCOM_APP_ID)
       done()
     })
+
     it('should return true if everything is set properly', (done) => {
       existsStub.withArgs(process.env.INTERCOM_API_KEY).returns(true)
       existsStub.withArgs(process.env.INTERCOM_APP_ID).returns(true)
@@ -125,6 +132,7 @@ describe('orion', () => {
       company_id: 'Company ID',
       name: 'Company NAME!'
     }
+
     beforeEach((done) => {
       sinon.stub(orion, 'canUseIntercom').returns(true)
       orion.intercomClient = {
@@ -134,6 +142,7 @@ describe('orion', () => {
       }
       done()
     })
+    
     afterEach((done) => {
       orion.canUseIntercom.restore()
       done()
