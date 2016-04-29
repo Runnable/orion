@@ -14,16 +14,20 @@ const mockIntercom = require('./mocks/mockIntercom')
 const Orion = require('../lib/orion')
 
 describe('orion', () => {
-  beforeEach(function (done) {
+  beforeEach((done) => {
     sinon.stub(Intercom, 'Client').returns(mockIntercom)
     done()
   })
-  afterEach(function (done) {
+  afterEach((done) => {
     Intercom.Client.restore()
     done()
   })
-  describe('constructor', function () {
+  describe('constructor', () => {
+    const fakeAppId = 'fake app id'
+    const fakeAppKey = 'fake app key'
     beforeEach((done) => {
+      process.env.INTERCOM_APP_ID = fakeAppId
+      process.env.INTERCOM_API_KEY = fakeAppKey
       sinon.stub(Orion.prototype, 'canUseIntercom').returns(true)
       done()
     })
@@ -34,8 +38,27 @@ describe('orion', () => {
     it('should check if we can use intercom before creating an intercom client', (done) => {
       const orion = new Orion()
       sinon.assert.calledOnce(Orion.prototype.canUseIntercom)
+      sinon.assert.calledOnce(mockIntercom.usePromises)
+      sinon.assert.calledOnce(Intercom.Client)
+      sinon.assert.calledWith(Intercom.Client, fakeAppId, fakeAppKey)
       expect(orion).to.be.instanceOf(Orion)
       done()
+    })
+  })
+
+  describe('canUseIntercom', () => {
+    const orion = new Orion()
+    beforeEach((done) => {
+      done()
+    })
+
+    it('should return false if no INTERCOM_APP_ID', function () {
+      delete process.env.INTERCOM_API_KEY
+      orion.canUseIntercom()
+    })
+    it('should return false if no INTERCOM_APP_ID', function () {
+      delete process.env.INTERCOM_APP_ID
+      orion.canUseIntercom()
     })
   })
 })
