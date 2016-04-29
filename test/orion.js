@@ -12,6 +12,7 @@ const expect = require('code').expect
 const Intercom = require('intercom-client')
 const mockIntercom = require('./mocks/mockIntercom')
 const proxyquire = require('proxyquire')
+const Promise = require('bluebird')
 
 const Orion = require('../lib/orion')
 
