@@ -18,7 +18,7 @@ INTERCOM_API_KEY
 var orion = require('orion')
 orion.upsertCompany({
   company_id: 'CompanyId',
-  name: 'My Awesome Company Name'
+  name: 'My Awesome Companies Name'
 })
 ```
 

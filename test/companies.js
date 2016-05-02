@@ -10,9 +10,9 @@ const afterEach = lab.afterEach
 const expect = require('code').expect
 const Promise = require('bluebird')
 
-const Company = require('../lib/company')
+const Companies = require('../lib/companies')
 
-describe('Company', function () {
+describe('Companies', function () {
   let orionStub
   let company
   beforeEach((done) => {
@@ -24,7 +24,7 @@ describe('Company', function () {
         }
       }
     }
-    company = new Company(orionStub)
+    company = new Companies(orionStub)
     orionStub.canUseIntercom.reset()
     done()
   })
@@ -55,8 +55,8 @@ describe('Company', function () {
 
   describe('create', () => {
     const createParams = {
-      company_id: 'Company ID',
-      name: 'Company NAME!'
+      company_id: 'Companies ID',
+      name: 'Companies NAME!'
     }
     const returnedVal = {
       body: {
@@ -87,7 +87,7 @@ describe('Company', function () {
 
   describe('listBy', () => {
     const listByParams = {
-      company_id: 'Company ID'
+      company_id: 'Companies ID'
     }
     const returnedVal = {
       body: {
@@ -143,7 +143,7 @@ describe('Company', function () {
   })
 
   describe('listUsers', () => {
-    const companyId = 'Company ID'
+    const companyId = 'Companies ID'
     const returnedVal = {
       body: {
         foo: 'bar'

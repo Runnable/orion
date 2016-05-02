@@ -18,7 +18,7 @@ describe('orion', () => {
   beforeEach((done) => {
     sinon.stub(Intercom, 'Client').returns(mockIntercom)
     Orion = proxyquire('../lib/orion', {
-      './company': sinon.stub()
+      './companies': sinon.stub()
     })
     done()
   })
@@ -57,21 +57,17 @@ describe('orion', () => {
     const oldIntercomAPIKey = process.env.INTERCOM_API_KEY
     const oldIntercomAppId = process.env.INTERCOM_APP_ID
     let existsStub
-    let envIsStub
     let orion
 
     beforeEach((done) => {
       process.env.INTERCOM_API_KEY = 'fake api key'
       process.env.INTERCOM_APP_ID = 'fake app id'
       existsStub = sinon.stub().returns(false)
-      envIsStub = sinon.stub().returns(true)
       const Orion = proxyquire('../lib/orion', {
-        '101/exists': existsStub,
-        '101/env-is': envIsStub
+        '101/exists': existsStub
       })
       orion = new Orion()
       existsStub.reset()
-      envIsStub.reset()
       done()
     })
 
@@ -86,7 +82,6 @@ describe('orion', () => {
       existsStub.withArgs(process.env.INTERCOM_API_KEY).returns(false)
       existsStub.withArgs(process.env.INTERCOM_APP_ID).returns(true)
       expect(orion.canUseIntercom()).to.equal(false)
-      sinon.assert.notCalled(envIsStub)
       sinon.assert.calledWith(existsStub, process.env.INTERCOM_API_KEY)
       done()
     })
@@ -96,19 +91,6 @@ describe('orion', () => {
       existsStub.withArgs(process.env.INTERCOM_API_KEY).returns(true)
       existsStub.withArgs(process.env.INTERCOM_APP_ID).returns(false)
       expect(orion.canUseIntercom()).to.equal(false)
-      sinon.assert.notCalled(envIsStub)
-      sinon.assert.calledWith(existsStub, process.env.INTERCOM_APP_ID)
-      done()
-    })
-
-    it('should return false if not the right env', (done) => {
-      existsStub.withArgs(process.env.INTERCOM_API_KEY).returns(true)
-      existsStub.withArgs(process.env.INTERCOM_APP_ID).returns(true)
-      expect(orion.canUseIntercom()).to.equal(false)
-      sinon.assert.calledOnce(envIsStub)
-      sinon.assert.calledWith(envIsStub, 'test')
-      sinon.assert.calledTwice(existsStub)
-      sinon.assert.calledWith(existsStub, process.env.INTERCOM_API_KEY)
       sinon.assert.calledWith(existsStub, process.env.INTERCOM_APP_ID)
       done()
     })
@@ -116,10 +98,7 @@ describe('orion', () => {
     it('should return true if everything is set properly', (done) => {
       existsStub.withArgs(process.env.INTERCOM_API_KEY).returns(true)
       existsStub.withArgs(process.env.INTERCOM_APP_ID).returns(true)
-      envIsStub.returns(false)
       expect(orion.canUseIntercom()).to.equal(true)
-      sinon.assert.calledOnce(envIsStub)
-      sinon.assert.calledWith(envIsStub, 'test')
       sinon.assert.calledTwice(existsStub)
       sinon.assert.calledWith(existsStub, process.env.INTERCOM_API_KEY)
       sinon.assert.calledWith(existsStub, process.env.INTERCOM_APP_ID)
