@@ -12,13 +12,14 @@ const expect = require('code').expect
 const Intercom = require('intercom-client')
 const mockIntercom = require('./mocks/mockIntercom')
 const proxyquire = require('proxyquire')
-const Promise = require('bluebird')
-
-const Orion = require('../lib/orion')
 
 describe('orion', () => {
+  let Orion
   beforeEach((done) => {
     sinon.stub(Intercom, 'Client').returns(mockIntercom)
+    Orion = proxyquire('../lib/orion', {
+      './company': sinon.stub()
+    })
     done()
   })
 
@@ -123,50 +124,6 @@ describe('orion', () => {
       sinon.assert.calledWith(existsStub, process.env.INTERCOM_API_KEY)
       sinon.assert.calledWith(existsStub, process.env.INTERCOM_APP_ID)
       done()
-    })
-  })
-
-  describe('upsertCompany', () => {
-    const orion = new Orion()
-    const upsertParams = {
-      company_id: 'Company ID',
-      name: 'Company NAME!'
-    }
-
-    beforeEach((done) => {
-      sinon.stub(orion, 'canUseIntercom').returns(true)
-      orion.intercomClient = {
-        companies: {
-          create: sinon.stub().returns(Promise.resolve())
-        }
-      }
-      done()
-    })
-
-    afterEach((done) => {
-      orion.canUseIntercom.restore()
-      done()
-    })
-
-    it('should do nothing if we can\'t use intercom', (done) => {
-      orion.canUseIntercom.returns(false)
-      orion.upsertCompany(upsertParams)
-        .then(() => {
-          sinon.assert.calledOnce(orion.canUseIntercom)
-          sinon.assert.notCalled(orion.intercomClient.companies.create)
-        })
-        .asCallback(done)
-    })
-
-    it('should create the company if one exists', (done) => {
-      orion.canUseIntercom.returns(true)
-      orion.upsertCompany(upsertParams)
-        .then(() => {
-          sinon.assert.calledOnce(orion.canUseIntercom)
-          sinon.assert.calledOnce(orion.intercomClient.companies.create)
-          sinon.assert.calledWith(orion.intercomClient.companies.create, upsertParams)
-        })
-        .asCallback(done)
     })
   })
 })
