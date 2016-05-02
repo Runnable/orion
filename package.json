@@ -20,7 +20,7 @@
   },
   "scripts": {
     "build": "babel --out-dir . lib",
-    "prepublish": "not-in-install && npm run build || in-install",
+    "prepublish": "npm run build",
     "doc": "jsdoc lib/index.js -d doc/; open -a 'Google Chrome' doc/index.html",
     "lint": "standard --verbose",
     "unit": "lab -v -c -a code",
