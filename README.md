@@ -16,13 +16,9 @@ INTERCOM_API_KEY
 
 ```
 var orion = require('orion')
-orion.upsertCompany({
+orion.companies.create({
   company_id: 'CompanyId',
   name: 'My Awesome Companies Name'
 })
 ```
-
-## API
-
-`upsertCompany` - Passes data through to intercom - https://developers.intercom.io/reference#create-or-update-company
 
