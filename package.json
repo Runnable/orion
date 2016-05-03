@@ -1,6 +1,6 @@
 {
   "name": "@runnable/orion",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Orion, the huntstman, in charge of tracking down big game, in this case big customers.",
   "main": "index.js",
   "dependencies": {
