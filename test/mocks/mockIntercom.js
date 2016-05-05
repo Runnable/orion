@@ -3,5 +3,5 @@
 const sinon = require('sinon')
 
 module.exports = {
-  usePromises: sinon.stub()
+  usePromises: sinon.stub().returns(true)
 }
