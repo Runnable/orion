@@ -16,7 +16,7 @@
     "lab": "^10.3.2",
     "proxyquire": "^1.7.4",
     "sinon": "^1.17.3",
-    "standard": "^6.0.8"
+    "standard": "^7.0.1"
   },
   "scripts": {
     "build": "babel --out-dir . lib",
