@@ -11,43 +11,58 @@ const expect = require('code').expect
 const Promise = require('bluebird')
 
 const Companies = require('../lib/companies')
+const Util = require('../lib/util')
 
 describe('Companies', function () {
-  let orionStub
   let company
+
   beforeEach((done) => {
-    orionStub = {
-      canUseIntercom: sinon.stub().returns(true),
-      intercomClient: {
-        companies: {
-          create: sinon.stub()
-        }
-      }
-    }
-    company = new Companies(orionStub)
-    orionStub.canUseIntercom.reset()
+    company = new Companies({
+      create: sinon.stub().returns(Promise.resolve('create'))
+    })
+    sinon.stub(Util, 'canUseIntercom').returns(true)
+    done()
+  })
+
+  afterEach((done) => {
+    Util.canUseIntercom.restore()
     done()
   })
 
   describe('_wrap', () => {
-    it('should do nothing if we can\'t use intercom', (done) => {
-      orionStub.canUseIntercom.returns(false)
+    it('should do nothing if we cannot use intercom', (done) => {
+      Util.canUseIntercom.returns(false)
       company._wrap('create', '1', '2', '3')
         .then(() => {
-          sinon.assert.calledOnce(orionStub.canUseIntercom)
-          sinon.assert.notCalled(orionStub.intercomClient.companies.create)
+          sinon.assert.calledOnce(Util.canUseIntercom)
+          sinon.assert.notCalled(company.client.create)
         })
         .asCallback(done)
     })
 
-    it('should call method on companies with all the supplied arguments', (done) => {
-      orionStub.canUseIntercom.returns(true)
-      orionStub.intercomClient.companies.create.returns(Promise.resolve('create'))
+    it('should reject if the client is invalid', (done) => {
+      company.client = null
+      company._wrap('create').asCallback((err) => {
+        expect(err).to.exist()
+        expect(err.message).to.match(/invalid.*client/i)
+        done()
+      })
+    })
+
+    it('should reject if the method does not exist', (done) => {
+      company._wrap('not-a-thing').asCallback((err) => {
+        expect(err).to.exist()
+        expect(err.message).to.match(/has no method/i)
+        done()
+      })
+    })
+
+    it('should call method on client with supplied arguments', (done) => {
       company._wrap('create', '1', '2', '3')
         .then(() => {
-          sinon.assert.calledOnce(orionStub.canUseIntercom)
-          sinon.assert.calledOnce(orionStub.intercomClient.companies.create)
-          sinon.assert.calledWith(orionStub.intercomClient.companies.create, '1', '2', '3')
+          sinon.assert.calledOnce(Util.canUseIntercom)
+          sinon.assert.calledOnce(company.client.create)
+          sinon.assert.calledWith(company.client.create, '1', '2', '3')
         })
         .asCallback(done)
     })
