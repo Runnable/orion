@@ -90,7 +90,7 @@ describe('Tags', function () {
         .then((results) => {
           sinon.assert.calledOnce(tag._wrap)
           sinon.assert.calledWithExactly(tag._wrap, 'list')
-          expect(results).to.equal(returnedVal)
+          expect(results).to.equal(returnedVal.body)
         })
         .asCallback(done)
     })
