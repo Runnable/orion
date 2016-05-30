@@ -15,17 +15,13 @@ const Util = require('../lib/util')
 
 describe('Base', function () {
   let base
-  let client
-  const sampleNextPageInfo = { body: { page: 2 } }
 
   beforeEach((done) => {
-    client = {
-      nextPage: sinon.stub().returns(Promise.resolve(sampleNextPageInfo)),
+    base = new Base({
       sample: {
         list: sinon.stub().returns(Promise.resolve(true))
       }
-    }
-    base = new Base(client, 'sample')
+    }, 'sample')
     sinon.stub(Util, 'canUseIntercom').returns(true)
     done()
   })
@@ -69,49 +65,6 @@ describe('Base', function () {
           sinon.assert.calledOnce(Util.canUseIntercom)
           sinon.assert.calledOnce(base.client.list)
           sinon.assert.calledWithExactly(base.client.list)
-        })
-        .asCallback(done)
-    })
-  })
-
-  describe('nextPage', () => {
-    const samplePageInfo = { page: 1 }
-
-    it('should do nothing if we cannot use intercom', (done) => {
-      Util.canUseIntercom.returns(false)
-      base.nextPage(samplePageInfo)
-        .then(() => {
-          sinon.assert.calledOnce(Util.canUseIntercom)
-          sinon.assert.notCalled(base.client.list)
-        })
-        .asCallback(done)
-    })
-
-    it('should reject if the client is invalid', (done) => {
-      base.client = null
-      base.nextPage(samplePageInfo).asCallback((err) => {
-        expect(err).to.exist()
-        expect(err.message).to.match(/invalid.*client/i)
-        done()
-      })
-    })
-
-    it('should call nextPage on the client', (done) => {
-      base.nextPage(samplePageInfo)
-        .then(() => {
-          sinon.assert.calledOnce(base.baseClient.nextPage)
-          sinon.assert.calledWithExactly(
-            base.baseClient.nextPage,
-            samplePageInfo
-          )
-        })
-        .asCallback(done)
-    })
-
-    it('should call nextPage on the client', (done) => {
-      base.nextPage(samplePageInfo)
-        .then((body) => {
-          expect(body).to.equal(sampleNextPageInfo.body)
         })
         .asCallback(done)
     })
