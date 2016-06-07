@@ -10,62 +10,24 @@ const afterEach = lab.afterEach
 const expect = require('code').expect
 const Promise = require('bluebird')
 
+const Base = require('../lib/base')
 const Users = require('../lib/users')
-const Util = require('../lib/util')
 
 describe('Users', function () {
   let user
 
   beforeEach((done) => {
     user = new Users({
-      create: sinon.stub().returns(Promise.resolve('create'))
+      users: {
+        create: sinon.stub().returns(Promise.resolve('create'))
+      }
     })
-    sinon.stub(Util, 'canUseIntercom').returns(true)
     done()
   })
 
-  afterEach((done) => {
-    Util.canUseIntercom.restore()
+  it('should extend base', (done) => {
+    expect(user).to.be.an.instanceOf(Base)
     done()
-  })
-
-  describe('_wrap', () => {
-    it('should do nothing if we cannot use intercom', (done) => {
-      Util.canUseIntercom.returns(false)
-      user._wrap('create', '1', '2', '3')
-        .then(() => {
-          sinon.assert.calledOnce(Util.canUseIntercom)
-          sinon.assert.notCalled(user.client.create)
-        })
-        .asCallback(done)
-    })
-
-    it('should reject if the client is invalid', (done) => {
-      user.client = null
-      user._wrap('create').asCallback((err) => {
-        expect(err).to.exist()
-        expect(err.message).to.match(/invalid.*client/i)
-        done()
-      })
-    })
-
-    it('should reject if the method does not exist', (done) => {
-      user._wrap('not-a-thing').asCallback((err) => {
-        expect(err).to.exist()
-        expect(err.message).to.match(/has no method/i)
-        done()
-      })
-    })
-
-    it('should call method on client with supplied arguments', (done) => {
-      user._wrap('create', '1', '2', '3')
-        .then(() => {
-          sinon.assert.calledOnce(Util.canUseIntercom)
-          sinon.assert.calledOnce(user.client.create)
-          sinon.assert.calledWith(user.client.create, '1', '2', '3')
-        })
-        .asCallback(done)
-    })
   })
 
   describe('create', () => {
