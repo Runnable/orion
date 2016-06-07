@@ -18,7 +18,9 @@ describe('Companies', function () {
 
   beforeEach((done) => {
     company = new Companies({
-      create: sinon.stub().returns(Promise.resolve('create'))
+      companies: {
+        create: sinon.stub().returns(Promise.resolve('create'))
+      }
     })
     sinon.stub(Util, 'canUseIntercom').returns(true)
     done()
@@ -27,45 +29,6 @@ describe('Companies', function () {
   afterEach((done) => {
     Util.canUseIntercom.restore()
     done()
-  })
-
-  describe('_wrap', () => {
-    it('should do nothing if we cannot use intercom', (done) => {
-      Util.canUseIntercom.returns(false)
-      company._wrap('create', '1', '2', '3')
-        .then(() => {
-          sinon.assert.calledOnce(Util.canUseIntercom)
-          sinon.assert.notCalled(company.client.create)
-        })
-        .asCallback(done)
-    })
-
-    it('should reject if the client is invalid', (done) => {
-      company.client = null
-      company._wrap('create').asCallback((err) => {
-        expect(err).to.exist()
-        expect(err.message).to.match(/invalid.*client/i)
-        done()
-      })
-    })
-
-    it('should reject if the method does not exist', (done) => {
-      company._wrap('not-a-thing').asCallback((err) => {
-        expect(err).to.exist()
-        expect(err.message).to.match(/has no method/i)
-        done()
-      })
-    })
-
-    it('should call method on client with supplied arguments', (done) => {
-      company._wrap('create', '1', '2', '3')
-        .then(() => {
-          sinon.assert.calledOnce(Util.canUseIntercom)
-          sinon.assert.calledOnce(company.client.create)
-          sinon.assert.calledWith(company.client.create, '1', '2', '3')
-        })
-        .asCallback(done)
-    })
   })
 
   describe('create', () => {
