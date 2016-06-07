@@ -113,7 +113,7 @@ describe('orion', () => {
     it('should call nextPage on the client', (done) => {
       orion.nextPage(samplePageInfo)
         .then((body) => {
-          expect(body).to.deep.equal({ page: 2 })
+          expect(body).to.equal({ page: 2 })
         })
         .asCallback(done)
     })
