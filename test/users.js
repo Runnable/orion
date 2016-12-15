@@ -19,7 +19,8 @@ describe('Users', function () {
   beforeEach((done) => {
     user = new Users({
       users: {
-        create: sinon.stub().returns(Promise.resolve('create'))
+        create: sinon.stub().returns(Promise.resolve('create')),
+        find: sinon.stub().returns(Promise.resolve('find'))
       }
     })
     done()
@@ -56,6 +57,37 @@ describe('Users', function () {
         .then((results) => {
           sinon.assert.calledOnce(user._wrap)
           sinon.assert.calledWith(user._wrap, 'create', createParams)
+          expect(results).to.equal(returnedVal)
+        })
+        .asCallback(done)
+    })
+  })
+
+  describe('find', () => {
+    const findParams = {
+      email: 'sohail@awesome.com'
+    }
+    const returnedVal = {
+      body: {
+        foo: 'bar'
+      }
+    }
+
+    beforeEach((done) => {
+      sinon.stub(user, '_wrap').returns(Promise.resolve(returnedVal))
+      done()
+    })
+
+    afterEach((done) => {
+      user._wrap.restore()
+      done()
+    })
+
+    it('should call _wrap with the proper parameters', (done) => {
+      user.find(findParams)
+        .then((results) => {
+          sinon.assert.calledOnce(user._wrap)
+          sinon.assert.calledWith(user._wrap, 'find', findParams)
           expect(results).to.equal(returnedVal)
         })
         .asCallback(done)
