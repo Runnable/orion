@@ -59,7 +59,7 @@ describe('Base', function () {
       })
     })
 
-    it('should call method on client with supplied arguments', (done) => {
+    it('should call list method on client with supplied arguments', (done) => {
       base._wrap('list')
         .then(() => {
           sinon.assert.calledOnce(Util.canUseIntercom)
