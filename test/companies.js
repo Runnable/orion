@@ -128,7 +128,11 @@ describe('Companies', function () {
     const companyId = 'Companies ID'
     const returnedVal = {
       body: {
-        foo: 'bar'
+        users: [{ 'foo': 'bar' }],
+        pages: {
+          page: 1,
+          total_pages: 1
+        }
       }
     }
     beforeEach((done) => {
@@ -146,7 +150,7 @@ describe('Companies', function () {
         .then((results) => {
           sinon.assert.calledOnce(company._wrap)
           sinon.assert.calledWith(company._wrap, 'listUsers', {id: companyId})
-          expect(results).to.equal(returnedVal.body)
+          expect(results).to.equal(returnedVal.body.users)
         })
         .asCallback(done)
     })
