@@ -68,9 +68,72 @@ describe('Tags', () => {
     })
   })
 
+  describe('delete', () => {
+    const deleteParams = {
+      tag_id: 'Tag ID'
+    }
+    const returnedVal = {
+      body: {
+        foo: 'bar'
+      }
+    }
+
+    beforeEach((done) => {
+      sinon.stub(tag, '_wrap').returns(Promise.resolve(returnedVal))
+      done()
+    })
+
+    afterEach((done) => {
+      tag._wrap.restore()
+      done()
+    })
+
+    it('should call _wrap with the proper parameters', (done) => {
+      tag.delete(deleteParams)
+        .then((results) => {
+          sinon.assert.calledOnce(tag._wrap)
+          sinon.assert.calledWith(tag._wrap, 'delete', deleteParams)
+          expect(results).to.equal(returnedVal)
+        })
+        .asCallback(done)
+    })
+  })
+
+  describe('list', () => {
+    const returnedVal = {
+      body: {
+        foo: 'bar'
+      }
+    }
+
+    beforeEach((done) => {
+      sinon.stub(tag, '_wrap').returns(Promise.resolve(returnedVal))
+      done()
+    })
+
+    afterEach((done) => {
+      tag._wrap.restore()
+      done()
+    })
+
+    it('should call _wrap with the proper parameters', (done) => {
+      tag.list()
+        .then((results) => {
+          sinon.assert.calledOnce(tag._wrap)
+          sinon.assert.calledWith(tag._wrap, 'list')
+          expect(results).to.equal(returnedVal.body)
+        })
+        .asCallback(done)
+    })
+  })
+
   describe('tag', () => {
-    const createParams = {
-      tag_id: 'Tag ID',
+    const tagParams = {
+      companies: [
+        {
+          id: 'softwareCompany'
+        }
+      ],
       name: 'Tag name'
     }
     const returnedVal = {
@@ -90,10 +153,10 @@ describe('Tags', () => {
     })
 
     it('should call _wrap with the proper parameters', (done) => {
-      tag.tag(createParams)
+      tag.tag(tagParams)
         .then((results) => {
           sinon.assert.calledOnce(tag._wrap)
-          sinon.assert.calledWith(tag._wrap, 'tag', createParams)
+          sinon.assert.calledWith(tag._wrap, 'tag', tagParams)
           expect(results).to.equal(returnedVal)
         })
         .asCallback(done)
@@ -101,8 +164,12 @@ describe('Tags', () => {
   })
 
   describe('untag', () => {
-    const createParams = {
-      tag_id: 'Tag ID',
+    const untagParams = {
+      companies: [
+        {
+          id: 'softwareCompany'
+        }
+      ],
       name: 'Tag name'
     }
     const returnedVal = {
@@ -122,42 +189,10 @@ describe('Tags', () => {
     })
 
     it('should call _wrap with the proper parameters', (done) => {
-      tag.untag(createParams)
+      tag.untag(untagParams)
         .then((results) => {
           sinon.assert.calledOnce(tag._wrap)
-          sinon.assert.calledWith(tag._wrap, 'untag', createParams)
-          expect(results).to.equal(returnedVal)
-        })
-        .asCallback(done)
-    })
-  })
-
-  describe('delete', () => {
-    const createParams = {
-      tag_id: 'Tag ID',
-      name: 'Tag name'
-    }
-    const returnedVal = {
-      body: {
-        foo: 'bar'
-      }
-    }
-
-    beforeEach((done) => {
-      sinon.stub(tag, '_wrap').returns(Promise.resolve(returnedVal))
-      done()
-    })
-
-    afterEach((done) => {
-      tag._wrap.restore()
-      done()
-    })
-
-    it('should call _wrap with the proper parameters', (done) => {
-      tag.delete(createParams)
-        .then((results) => {
-          sinon.assert.calledOnce(tag._wrap)
-          sinon.assert.calledWith(tag._wrap, 'delete', createParams)
+          sinon.assert.calledWith(tag._wrap, 'untag', untagParams)
           expect(results).to.equal(returnedVal)
         })
         .asCallback(done)
