@@ -22,7 +22,7 @@ describe('Users', function () {
         create: sinon.stub().returns(Promise.resolve('create')),
         find: sinon.stub().returns(Promise.resolve('find'))
       }
-    })
+    }, 'user')
     done()
   })
 
@@ -91,6 +91,38 @@ describe('Users', function () {
           expect(results).to.equal(returnedVal)
         })
         .asCallback(done)
+    })
+  })
+
+  describe('list', () => {
+    const returnedVal = {
+      body: {
+        users: [{ 'foo': 'bar' }],
+        pages: {
+          page: 1,
+          total_pages: 1
+        }
+      }
+    }
+    beforeEach((done) => {
+      sinon.stub(user, '_wrap').returns(Promise.resolve(returnedVal))
+      sinon.stub(user, '_getAllObjects').returns([{ 'foo': 'bar' }])
+      done()
+    })
+
+    afterEach((done) => {
+      user._wrap.restore()
+      done()
+    })
+
+    it('should call _wrap with the proper parameters', (done) => {
+      user.list()
+        .then((results) => {
+          sinon.assert.calledOnce(user._wrap)
+          sinon.assert.calledWith(user._wrap, 'list')
+          expect(results).to.equal(returnedVal.body.users)
+          done()
+        })
     })
   })
 })

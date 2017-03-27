@@ -20,7 +20,8 @@ describe('Base', function () {
     base = new Base({
       sample: {
         list: sinon.stub().returns(Promise.resolve(true))
-      }
+      },
+      nextPage: sinon.stub().returns(Promise.resolve(true))
     }, 'sample')
     sinon.stub(Util, 'canUseIntercom').returns(true)
     done()
@@ -67,6 +68,69 @@ describe('Base', function () {
           sinon.assert.calledWithExactly(base.client.list)
         })
         .asCallback(done)
+    })
+  })
+
+  describe('_getAllObjects', () => {
+    it('should throw an error if it does not receive a response from Intercom', (done) => {
+      base._getAllObjects(null).asCallback((err) => {
+        expect(err).to.exist()
+        expect(err.message).to.match(/Failed to find samples on Intercom./i)
+        done()
+      })
+    })
+
+    it('should not call nextPage if no more pages exist', (done) => {
+      const returnedVal = {
+        body: {
+          sample: [{ 'foo': 'bar' }],
+          pages: {
+            page: 1,
+            total_pages: 1
+          }
+        }
+      }
+
+      // sinon.stub(base, 'nextPage').returns(Promise.resolve(true))
+      sinon.stub(base, '_getAllObjects').returns(Promise.resolve(true))
+
+      base._getAllObjects(returnedVal, [])
+        .then(() => {
+          sinon.assert.calledOnce(base.nextPage)
+          done()
+        })
+    })
+
+    it('should call itself if pages exist', (done) => {
+      const firstPage = {
+        body: {
+          samples: [{ 'foo': 'bar' }],
+          pages: {
+            page: 1,
+            total_pages: 2
+          }
+        }
+      }
+
+      const secondPage = {
+        body: {
+          samples: [{ 'foo': 'bar' }],
+          pages: {
+            page: 2,
+            total_pages: 2
+          }
+        }
+      }
+
+      sinon.stub(base, '_getAllObjects').returns(Promise.resolve(true))
+      // sinon.stub(base, 'nextPage').returns(secondPage, [{ 'foo': 'bar' }])
+
+      base._getAllObjects(firstPage, [])
+        .then(() => {
+          sinon.assert.calledOnce(base.nextPage)
+          sinon.assert.calledTwice(base._getAllObjects)
+          done()
+        })
     })
   })
 })
