@@ -15,15 +15,18 @@ const Util = require('../lib/util')
 
 describe('Base', function () {
   let base
+  let baseClient
 
   beforeEach((done) => {
-    base = new Base({
+    baseClient = {
       sample: {
         list: sinon.stub().returns(Promise.resolve(true))
       },
       nextPage: sinon.stub().returns(Promise.resolve(true))
-    }, 'sample')
+    }
+    base = new Base(baseClient, 'samples')
     sinon.stub(Util, 'canUseIntercom').returns(true)
+    sinon.spy(base, '_getAllObjects')
     done()
   })
 
@@ -82,33 +85,26 @@ describe('Base', function () {
 
     it('should not call nextPage if no more pages exist', (done) => {
       const returnedVal = {
-        body: {
-          sample: [{ 'foo': 'bar' }],
-          pages: {
-            page: 1,
-            total_pages: 1
-          }
+        samples: [{ 'foo': 'bar' }],
+        pages: {
+          page: 1,
+          total_pages: 1
         }
       }
 
-      // sinon.stub(base, 'nextPage').returns(Promise.resolve(true))
-      sinon.stub(base, '_getAllObjects').returns(Promise.resolve(true))
-
       base._getAllObjects(returnedVal, [])
         .then(() => {
-          sinon.assert.calledOnce(base.nextPage)
+          sinon.assert.notCalled(baseClient.nextPage)
           done()
         })
     })
 
     it('should call itself if pages exist', (done) => {
       const firstPage = {
-        body: {
-          samples: [{ 'foo': 'bar' }],
-          pages: {
-            page: 1,
-            total_pages: 2
-          }
+        samples: [{ 'foo': 'bar' }],
+        pages: {
+          page: 1,
+          total_pages: 2
         }
       }
 
@@ -122,12 +118,11 @@ describe('Base', function () {
         }
       }
 
-      sinon.stub(base, '_getAllObjects').returns(Promise.resolve(true))
-      // sinon.stub(base, 'nextPage').returns(secondPage, [{ 'foo': 'bar' }])
+      baseClient.nextPage.returns(Promise.resolve(secondPage))
 
       base._getAllObjects(firstPage, [])
         .then(() => {
-          sinon.assert.calledOnce(base.nextPage)
+          sinon.assert.calledOnce(baseClient.nextPage)
           sinon.assert.calledTwice(base._getAllObjects)
           done()
         })
