@@ -6,7 +6,7 @@
   "dependencies": {
     "101": "^1.5.0",
     "bluebird": "^3.3.5",
-    "intercom-client": "^2.8.0",
+    "intercom-client": "^2.8.7",
     "keypather": "^2.0.0"
   },
   "devDependencies": {

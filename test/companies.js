@@ -21,7 +21,7 @@ describe('Companies', function () {
       companies: {
         create: sinon.stub().returns(Promise.resolve('create'))
       }
-    })
+    }, 'companies')
     sinon.stub(Util, 'canUseIntercom').returns(true)
     done()
   })
@@ -96,7 +96,11 @@ describe('Companies', function () {
   describe('list', () => {
     const returnedVal = {
       body: {
-        foo: 'bar'
+        companies: [{ 'foo': 'bar' }],
+        pages: {
+          page: 1,
+          total_pages: 1
+        }
       }
     }
     beforeEach((done) => {
@@ -114,7 +118,7 @@ describe('Companies', function () {
         .then((results) => {
           sinon.assert.calledOnce(company._wrap)
           sinon.assert.calledWith(company._wrap, 'list')
-          expect(results).to.equal(returnedVal.body)
+          expect(results).to.equal(returnedVal.body.companies)
         })
         .asCallback(done)
     })
@@ -124,7 +128,11 @@ describe('Companies', function () {
     const companyId = 'Companies ID'
     const returnedVal = {
       body: {
-        foo: 'bar'
+        users: [{ 'foo': 'bar' }],
+        pages: {
+          page: 1,
+          total_pages: 1
+        }
       }
     }
     beforeEach((done) => {
@@ -142,7 +150,7 @@ describe('Companies', function () {
         .then((results) => {
           sinon.assert.calledOnce(company._wrap)
           sinon.assert.calledWith(company._wrap, 'listUsers', {id: companyId})
-          expect(results).to.equal(returnedVal.body)
+          expect(results).to.equal(returnedVal.body.users)
         })
         .asCallback(done)
     })
