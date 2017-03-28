@@ -19,7 +19,7 @@ describe('Base', function () {
 
   beforeEach((done) => {
     baseClient = {
-      sample: {
+      samples: {
         list: sinon.stub().returns(Promise.resolve(true))
       },
       nextPage: sinon.stub().returns(Promise.resolve(true))
@@ -67,14 +67,27 @@ describe('Base', function () {
       base._wrap('list')
         .then(() => {
           sinon.assert.calledOnce(Util.canUseIntercom)
-          sinon.assert.calledOnce(base.client.list)
-          sinon.assert.calledWithExactly(base.client.list)
+          sinon.assert.calledOnce(baseClient.samples.list)
+          sinon.assert.calledWithExactly(baseClient.samples.list)
         })
         .asCallback(done)
     })
   })
 
   describe('_getAllObjects', () => {
+    let returnedVal
+
+    beforeEach((done) => {
+      returnedVal = {
+        samples: [{ 'foo': 'bar' }],
+        pages: {
+          page: 1,
+          total_pages: 1
+        }
+      }
+      done()
+    })
+
     it('should throw an error if it does not receive a response from Intercom', (done) => {
       base._getAllObjects(null).asCallback((err) => {
         expect(err).to.exist()
@@ -83,15 +96,16 @@ describe('Base', function () {
       })
     })
 
-    it('should not call nextPage if no more pages exist', (done) => {
-      const returnedVal = {
-        samples: [{ 'foo': 'bar' }],
-        pages: {
-          page: 1,
-          total_pages: 1
-        }
-      }
+    it('should return nothing if calling the wrong route', (done) => {
+      base.name = 'doobie'
+      base._getAllObjects(returnedVal, [])
+        .then(() => {
+          sinon.assert.notCalled(baseClient.nextPage)
+          done()
+        })
+    })
 
+    it('should not call nextPage if no more pages exist', (done) => {
       base._getAllObjects(returnedVal, [])
         .then(() => {
           sinon.assert.notCalled(baseClient.nextPage)
